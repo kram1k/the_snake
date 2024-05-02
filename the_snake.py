@@ -212,7 +212,6 @@ def main():
             snake.draw()
             apple.draw()
             check_collision(snake, apple)
-            
             pygame.display.update()
 
 
