@@ -200,6 +200,7 @@ def main():
     snake = Snake()
     apple = Apple()
     while True:
+        clock.tick(SPEED)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -211,7 +212,7 @@ def main():
             snake.draw()
             apple.draw()
             check_collision(snake, apple)
-            clock.tick(SPEED)
+            
             pygame.display.update()
 
 
