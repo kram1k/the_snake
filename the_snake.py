@@ -129,7 +129,7 @@ class Snake(GameObject):
         self.length = 1
         self.positions = [SCREEN_CENTER]
         self.direction = random_direction
-    
+
     def check_crash(self):
         """Проверяет, столкнулась ли змейка с собой."""
         head = self.positions[0]
@@ -185,7 +185,7 @@ def check_collision(snake, apple):
     snake_head = snake.get_head_position()
     if snake_head == apple.position:
         snake.length += 1
-        apple.randomize_position()      
+        apple.randomize_position()
 
 
 def main():
