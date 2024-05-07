@@ -194,7 +194,7 @@ def main():
     apple.randomize_position(snake)
     while True:
         clock.tick(SPEED)
-        if handle_keys(snake) is Fal    se:
+        if handle_keys(snake) is False:
             pygame.quit()
             sys.exit()
         handle_keys(snake)
