@@ -1,4 +1,5 @@
 """Модуль для рандомного появления предметов."""
+import typing
 import sys
 from random import choice, randint
 
@@ -145,12 +146,11 @@ class Apple(GameObject):
     """
 
     def __init__(self, position=SCREEN_CENTER, body_color=APPLE_COLOR,
-                 occupied_cells: list = []):
+                 occupied_cells: typing.Optional[list] = None):
         """Иницилизатор класса Apple."""
-        self.occupied_cells: list = []
+        self.occupied_cells = occupied_cells or []
         super().__init__(body_color=body_color, position=position)
         self.randomize_position()
-        self.body_color = APPLE_COLOR
 
     def randomize_position(self):
         """Устанавливает случайное положение яблока на игровом поле."""
@@ -177,7 +177,6 @@ def handle_keys(snake):
             next_direction = DIRECTIONS.get(event.key)
             if next_direction:
                 snake.next_direction = next_direction
-                return True
     return True
 
 
