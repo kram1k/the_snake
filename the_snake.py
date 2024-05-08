@@ -16,6 +16,13 @@ DOWN = (0, 1)
 LEFT = (-1, 0)
 RIGHT = (1, 0)
 
+DIRECTIONS = {
+    pygame.K_UP: UP,
+    pygame.K_DOWN: DOWN,
+    pygame.K_LEFT: LEFT,
+    pygame.K_RIGHT: RIGHT
+}
+
 BOARD_BACKGROUND_COLOR = (0, 0, 0)
 
 BORDER_COLOR = (93, 216, 228)
@@ -34,15 +41,8 @@ clock = pygame.time.Clock()
 
 random_direction = choice(seq=[RIGHT, LEFT, UP, DOWN])
 
-DIRECTIONS = {
-    (pygame.K_UP, DOWN): UP,
-    (pygame.K_DOWN, UP): DOWN,
-    (pygame.K_LEFT, RIGHT): LEFT,
-    (pygame.K_RIGHT, LEFT): RIGHT
-}
 
-
-class GameObject():
+class GameObject:
     """
     Это базовый класс.
 
@@ -72,15 +72,16 @@ class Snake(GameObject):
     """
 
     def __init__(self, length=1, direction=RIGHT, next_direction=None,
-                 last=None, body_color=BOARD_BACKGROUND_COLOR,
+                 last=None, body_color=SNAKE_COLOR,
                  position=SCREEN_CENTER):
         """Иницилизатор класса Snake."""
-        super().__init__(body_color=SNAKE_COLOR, position=SCREEN_CENTER)
+        super().__init__(position=position, body_color=body_color)
         self.positions = [self.position]
         self.length = length
         self.direction = direction
         self.next_direction = next_direction
         self.last = last
+        self.body_color = SNAKE_COLOR
 
     def update_direction(self):
         """Метод обновления направления после нажатия на кнопку."""
@@ -105,7 +106,7 @@ class Snake(GameObject):
     def check_crash(self):
         """Проверяет, столкнулась ли змейка с собой."""
         for position in self.positions[1:]:
-            if self.get_head_position == position:
+            if self.get_head_position() == position:
                 self.reset()
 
     def move(self):
@@ -143,22 +144,22 @@ class Apple(GameObject):
     Яблоко должно отображаться в случайных клетках игрового поля.
     """
 
-    def __init__(self, position=SCREEN_CENTER, body_color=APPLE_COLOR):
+    def __init__(self, position=SCREEN_CENTER, body_color=APPLE_COLOR,
+                 occupied_cells: list = []):
         """Иницилизатор класса Apple."""
-        super().__init__(body_color=APPLE_COLOR, position=SCREEN_CENTER)
+        self.occupied_cells: list = []
+        super().__init__(body_color=body_color, position=position)
         self.randomize_position()
-        self.position
         self.body_color = APPLE_COLOR
 
-    def randomize_position(self, snake=None):
+    def randomize_position(self):
         """Устанавливает случайное положение яблока на игровом поле."""
         while True:
-            self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                             randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
-            if snake and self.position not in snake.positions:
-                break
-            elif not snake:
-                break
+            new_position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                            randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+            if new_position not in self.occupied_cells:
+                self.position = new_position
+            break
 
     def draw(self):
         """Метод draw класса Apple."""
@@ -167,16 +168,17 @@ class Apple(GameObject):
         pygame.draw.rect(screen, BORDER_COLOR, rect, 1)
 
 
-def handle_keys(game_object):
+def handle_keys(snake):
     """Функция обработки действий пользователя"""
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return False
         if event.type == pygame.KEYDOWN:
-            for key in DIRECTIONS:
-                if event.key == key[0] and game_object.direction != key[1]:
-                    game_object.next_direction = DIRECTIONS[key]
-                    return True
+            next_direction = DIRECTIONS.get(event.key)
+            if next_direction:
+                snake.next_direction = next_direction
+                return True
+    return True
 
 
 def check_collision(snake, apple):
@@ -190,14 +192,12 @@ def main():
     """Основной игровой цикл"""
     pygame.init()
     snake = Snake()
-    apple = Apple()
-    apple.randomize_position(snake)
+    apple = Apple(occupied_cells=snake.positions)
     while True:
         clock.tick(SPEED)
         if handle_keys(snake) is False:
             pygame.quit()
             sys.exit()
-        handle_keys(snake)
         screen.fill(BOARD_BACKGROUND_COLOR)
         snake.update_direction()
         snake.move()
