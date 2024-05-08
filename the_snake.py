@@ -106,9 +106,8 @@ class Snake(GameObject):
 
     def check_crash(self):
         """Проверяет, столкнулась ли змейка с собой."""
-        for position in self.positions[1:]:
-            if self.get_head_position() == position:
-                self.reset()
+        if self.get_head_position() in self.positions[1:]:
+            self.reset()
 
     def move(self):
         """Обновляет положение змейки в игре."""
